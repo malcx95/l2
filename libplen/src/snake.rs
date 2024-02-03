@@ -1,7 +1,6 @@
 use serde_derive::{Serialize, Deserialize};
 use crate::{constants, math::{self, vec2, Vec2}};
 
-const PLAYER_SPEED: f32 = 100.0;
 const FOOD_HIT_BOX: f32 = 5.0;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -31,9 +30,9 @@ impl Snake {
         }
     }
 
-    pub fn update(&mut self, delta_angle: f32, delta_time: f32) {
+    pub fn update(&mut self, delta_angle: f32, delta_time: f32, speed: f32) {
         let head = &mut self.segments[0];
-        let delta_position = Vec2::from_direction(head.angle, PLAYER_SPEED * delta_time);
+        let delta_position = Vec2::from_direction(head.angle, speed * delta_time);
         let mut old_angle = head.angle;
         let mut old_position = head.position;
 

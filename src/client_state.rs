@@ -9,7 +9,7 @@ use libplen::food::{Food, FoodType};
 use crate::assets::Assets;
 
 
-const MAX_SEGMENT_DISTANCE: f32 = 10.0;
+const MAX_SEGMENT_DISTANCE: f32 = 30.0;
 
 const COLORS: [macroquad::color::Color; 13] = [
     RED, GREEN, BLUE, YELLOW, PURPLE, ORANGE, PINK, VIOLET, MAGENTA, LIME, BROWN, GOLD, WHITE

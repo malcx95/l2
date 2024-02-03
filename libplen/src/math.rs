@@ -123,7 +123,6 @@ pub fn modulo(x: f32, div: f32) -> f32 {
     (x % div + div) % div
 }
 
-
 pub fn vec_add_wrap_around(a: Vec2, b: Vec2, div: f32) -> Vec2 {
     let mut result = a + b;
     result.x = modulo(result.x, div);

@@ -1,11 +1,15 @@
 use serde_derive::{Serialize, Deserialize};
 
+use crate::constants::DELTA_TIME;
 use crate::math::{Vec2, vec2};
 use crate::snake::{Snake, SnakeSegment};
 use crate::food::{Food, FoodType::*};
 
 
 const PLAYER_ANGLE_SPEED: f32 = 5.0;
+const PLAYER_MIN_SPEED: f32 = 100.0;
+const PLAYER_MAX_SPEED: f32 = 300.0;
+const PLAYER_ACCELERATION: f32 = 10.0;
 const NUMBER_OF_NON_COLLIDABLE_SEGMENTS: usize = 6;
 const EAT_GRACE_PERIOD: i32 = 10;
 
@@ -19,6 +23,7 @@ pub struct Player {
     pub input_y: f32,
 
     pub snake: Snake,
+    pub player_speed: f32,
 
     pub eat_grace_timer: i32,
 }
@@ -37,6 +42,8 @@ impl Player {
             input_y: 0.,
 
             snake: Snake::new(),
+            player_speed: PLAYER_MIN_SPEED,
+
             eat_grace_timer: 0,
         }
     }
@@ -105,6 +112,11 @@ impl Player {
     pub fn update(&mut self, delta_time: f32) {
         self.eat_grace_timer = i32::max(0, self.eat_grace_timer - 1);
         let delta_angle = self.input_x * PLAYER_ANGLE_SPEED * delta_time;
-        self.snake.update(delta_angle, delta_time);
+        
+        self.player_speed = f32::clamp(
+            self.player_speed + self.input_y * PLAYER_ACCELERATION,
+            PLAYER_MIN_SPEED, PLAYER_MAX_SPEED);
+
+        self.snake.update(delta_angle, delta_time, self.player_speed);
     }
 }
