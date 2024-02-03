@@ -13,9 +13,18 @@ const MAX_AMOUNT_OF_FOOD: usize = 1000;
 
 
 #[derive(Serialize, Deserialize, Clone)]
+pub enum GameStage {
+    Lobby,
+    Running,
+    Ended,
+}
+
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
     pub players: Vec<Player>,
     pub food: Vec<Food>,
+    pub stage: GameStage,
 }
 
 impl GameState {
@@ -23,6 +32,7 @@ impl GameState {
         GameState {
             players: Vec::new(),
             food: Vec::new(),
+            stage: GameStage::Lobby,
         }
     }
 
@@ -35,12 +45,24 @@ impl GameState {
      *  )
      */
     pub fn update(&mut self, delta: f32) {
-        for player in &mut self.players {
-            player.update(delta);
+        match self.stage {
+            GameStage::Running => {
+                for player in &mut self.players {
+                    player.update(delta);
+                }
+                self.update_food(delta);
+                self.handle_player_food();
+                self.handle_player_collisions();
+            },
+            GameStage::Lobby => {
+                for player in &self.players {
+                    if player.input_start_game {
+                        self.stage = GameStage::Running;
+                    }
+                }
+            },
+            _ => {}
         }
-        self.update_food(delta);
-        self.handle_player_food();
-        self.handle_player_collisions();
     }
 
     fn handle_player_collisions(&mut self) {

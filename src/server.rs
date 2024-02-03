@@ -173,9 +173,20 @@ impl Server {
 
             for player in &mut self.state.players {
                 if player.id == client.id {
+                    if client.input.change_color {
+                        match self.state.stage {
+                            gamestate::GameStage::Lobby => {
+                                player.color += 1;
+                            }
+                            _ => {}
+                        }
+                    }
+
                     player.set_input(
                         client.input.x_input,
                         client.input.y_input,
+                        client.input.start_game,
+                        client.input.change_color,
                     );
                 }
             }

@@ -1,5 +1,6 @@
 use serde_derive::{Serialize, Deserialize};
 use crate::{constants, math::{self, vec2, Vec2}};
+use rand::{self, Rng};
 
 const FOOD_HIT_BOX: f32 = 5.0;
 
@@ -19,10 +20,13 @@ pub struct Snake {
 
 impl Snake {
     pub fn new() -> Snake {
+        let mut rng = rand::thread_rng();
+        let x: f32 = rng.gen_range(0.0, constants::WINDOW_SIZE);
+        let y: f32 = rng.gen_range(0.0, constants::WINDOW_SIZE);
         Snake {
             segments: vec![
                 SnakeSegment {
-                    position: vec2(0., 0.),
+                    position: vec2(x, y),
                     angle: 0.,
                     cuttable: true,
                 }

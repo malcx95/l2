@@ -64,7 +64,7 @@ impl MainState {
             x_input += 1.0;
         }
 
-        ClientInput{ x_input, y_input }
+        ClientInput{ x_input, y_input, start_game: is_key_pressed(KeyCode::Space), change_color: is_key_pressed(KeyCode::C) }
     }
 
     fn update(&mut self, server_reader: &mut MessageReader) -> StateResult {

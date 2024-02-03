@@ -87,6 +87,8 @@ pub enum ServerMessage {
 pub struct ClientInput {
     pub x_input: f32,
     pub y_input: f32,
+    pub start_game: bool,
+    pub change_color: bool,
 }
 
 impl ClientInput {
@@ -94,6 +96,8 @@ impl ClientInput {
         ClientInput {
             x_input: 0.,
             y_input: 0.,
+            start_game: false,
+            change_color: false,
         }
     }
 }

@@ -1,6 +1,5 @@
 use serde_derive::{Serialize, Deserialize};
 
-use crate::constants::DELTA_TIME;
 use crate::math::{Vec2, vec2};
 use crate::snake::{Snake, SnakeSegment};
 use crate::food::{Food, FoodType::*};
@@ -17,10 +16,13 @@ const EAT_GRACE_PERIOD: i32 = 10;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
     pub id: u64,
+    pub color: usize,
     pub name: String,
 
     pub input_x: f32,
     pub input_y: f32,
+    pub input_start_game: bool,
+    pub input_change_color: bool,
 
     pub snake: Snake,
     pub player_speed: f32,
@@ -37,9 +39,12 @@ impl Player {
         Player {
             id,
             name,
+            color: id as usize,
 
             input_x: 0.,
             input_y: 0.,
+            input_start_game: false,
+            input_change_color: false,
 
             snake: Snake::new(),
             player_speed: PLAYER_MIN_SPEED,
@@ -104,9 +109,11 @@ impl Player {
         self.snake.segments[0].position
     }
 
-    pub fn set_input(&mut self, input_x: f32, input_y: f32) {
+    pub fn set_input(&mut self, input_x: f32, input_y: f32, input_start_game: bool, input_change_color: bool) {
         self.input_x = input_x;
         self.input_y = input_y;
+        self.input_start_game = input_start_game;
+        self.input_change_color = input_change_color;
     }
 
     pub fn update(&mut self, delta_time: f32) {
