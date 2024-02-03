@@ -1,20 +1,29 @@
 use libplen::constants;
 use libplen::gamestate::GameState;
 use libplen::math::{self, vec2, Vec2};
+use libplen::player::Player;
 use macroquad::prelude::*;
 use macroquad::texture;
 use libplen::food::Food;
 
 use crate::assets::Assets;
 
+
+const MAX_SEGMENT_DISTANCE: f32 = 10.0;
+
+
 pub struct ClientState {
-    // add client side state
+    screen_scale: f32,
 }
 
 impl ClientState {
     pub fn new() -> ClientState {
+        let screen_scale = match std::env::var("SCREEN_SCALE") {
+            Ok(val) => val.parse::<f32>().unwrap(),
+            Err(_) => 1.0,
+        };
         ClientState {
-            // init client stuff
+            screen_scale
         }
     }
 
@@ -31,47 +40,55 @@ impl ClientState {
 
         clear_background(BLACK);
         self.draw_bounds();
+        self.draw_players(&game_state.players);
+        self.draw_food(&game_state.food);
 
-        for player in &game_state.players {
+        Ok(())
+    }
+
+    fn draw_players(&self, players: &Vec<Player>) {
+        for player in players {
             let head_px = player.snake.segments[0].position.x;
             let head_py = player.snake.segments[0].position.y;
 
-            draw_circle(head_px, head_py, 5.0, RED);
+            draw_circle(head_px * self.screen_scale, head_py * self.screen_scale,
+                5.0 * self.screen_scale, RED);
 
             for i in 0..(player.snake.segments.len() - 1) {
                 let curr = &player.snake.segments[i];
                 let next = &player.snake.segments[i + 1];
+
+                if (curr.position - next.position).norm() > MAX_SEGMENT_DISTANCE {
+                    continue;
+                }
                 
                 draw_line(
-                    curr.position.x,
-                    curr.position.y,
-                    next.position.x,
-                    next.position.y,
-                    5.0,
+                    curr.position.x * self.screen_scale,
+                    curr.position.y * self.screen_scale,
+                    next.position.x * self.screen_scale,
+                    next.position.y * self.screen_scale,
+                    5.0 * self.screen_scale,
                     RED,
                 );
 
             }
         }
-        self.draw_food(&game_state.food);
-
-        Ok(())
     }
 
     fn draw_bounds(&self) {
         draw_rectangle_lines(
             0.0,
             0.0,
-            constants::WINDOW_SIZE,
-            constants::WINDOW_SIZE,
-            5.0,
+            constants::WINDOW_SIZE * self.screen_scale,
+            constants::WINDOW_SIZE * self.screen_scale,
+            5.0 * self.screen_scale,
             WHITE,
         );
     }
 
     fn draw_food(&self, food: &Vec<Food>) {
         for f in food {
-            draw_circle(f.position.x, f.position.y, 5.0, YELLOW);
+            draw_circle(f.position.x * self.screen_scale, f.position.y * self.screen_scale, 5.0 * self.screen_scale, YELLOW);
         }
     }
 }

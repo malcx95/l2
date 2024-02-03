@@ -1,4 +1,4 @@
-# Spes
+# l2
 
-Very spes
+A much better version of `l`.
 

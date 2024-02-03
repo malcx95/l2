@@ -84,7 +84,7 @@ impl MainState {
             }
         }
 
-        let mut input = Self::read_input();
+        let input = Self::read_input();
 
         self.client_state
             .update(elapsed.as_secs_f32(), &self.game_state, self.my_id);
@@ -103,7 +103,7 @@ impl MainState {
     }
 }
 
-#[macroquad::main("BasicShapes")]
+#[macroquad::main("l2")]
 async fn main() -> Result<(), String> {
     let host = std::env::var("SERVER").unwrap_or(String::from("localhost:4444"));
     let stream = TcpStream::connect(host).expect("Could not connect to server");
