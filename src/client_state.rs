@@ -4,7 +4,7 @@ use libplen::math::{self, vec2, Vec2};
 use libplen::player::Player;
 use macroquad::prelude::*;
 use macroquad::texture;
-use libplen::food::Food;
+use libplen::food::{Food, FoodType};
 
 use crate::assets::Assets;
 
@@ -79,6 +79,20 @@ impl ClientState {
                     body_color,
                 );
 
+                if !next.cuttable {
+                    let uncuttable_color = Color::new(1.0, 1.0, 1.0, 0.4);
+                    
+                    draw_line(
+                        curr.position.x * self.screen_scale,
+                        curr.position.y * self.screen_scale,
+                        next.position.x * self.screen_scale,
+                        next.position.y * self.screen_scale,
+                        10.0 * self.screen_scale,
+                        uncuttable_color,
+                    );
+                    
+                }
+
             }
         }
     }
@@ -96,7 +110,11 @@ impl ClientState {
 
     fn draw_food(&self, food: &Vec<Food>) {
         for f in food {
-            draw_circle(f.position.x * self.screen_scale, f.position.y * self.screen_scale, 5.0 * self.screen_scale, YELLOW);
+            let color = match f.food_type {
+                FoodType::Normal(_) => YELLOW,
+                FoodType::Armor(_) => BLUE,
+            };
+            draw_circle(f.position.x * self.screen_scale, f.position.y * self.screen_scale, 5.0 * self.screen_scale, color);
         }
     }
 }

@@ -8,12 +8,22 @@ const FOOD_SPEED: f32 = 100.0;
 const FOOD_SIZE: f32 = 10.0;
 const FOOD_ENERGY: u32 = 10;
 
+const ARMOR_ENERGY: usize = 10;
+const ARMOR_PROBABILITY: f32 = 0.1;
+
+
+#[derive(Clone, Copy, Serialize, Deserialize)]
+pub enum FoodType {
+    Normal(u32),
+    Armor(usize),
+}
+
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Food {
     pub position: Vec2,
     pub velocity: Vec2,
-    pub energy: u32,
+    pub food_type: FoodType,
 }
 
 
@@ -22,10 +32,18 @@ impl Food {
         let mut rng = rand::thread_rng();
         let x: f32 = rng.gen_range(-1.0, 1.0) * FOOD_SPEED;
         let y: f32 = rng.gen_range(-1.0, 1.0) * FOOD_SPEED;
+
+        let r = rand::random::<f32>();
+        let food_type = if r < ARMOR_PROBABILITY {
+            FoodType::Armor(ARMOR_ENERGY)
+        } else {
+            FoodType::Normal(FOOD_ENERGY)
+        };
+
         Food {
             position,
             velocity: vec2(x, y),
-            energy: FOOD_ENERGY,
+            food_type,
         }
     }
 

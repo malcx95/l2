@@ -7,7 +7,9 @@ const PLAYER_SPEED: f32 = 100.0;
 pub struct SnakeSegment {
     pub position: Vec2,
     pub angle: f32,
+    pub cuttable: bool,
 }
+
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Snake {
@@ -22,6 +24,7 @@ impl Snake {
                 SnakeSegment {
                     position: vec2(0., 0.),
                     angle: 0.,
+                    cuttable: true,
                 }
             ],
         }
@@ -49,5 +52,14 @@ impl Snake {
             old_angle = current_angle;
             old_position = current_position;
         }
+    }
+
+    pub fn get_first_cuttable_index(&self) -> Option<usize> {
+        for (i, segment) in self.segments.iter().enumerate() {
+            if segment.cuttable {
+                return Some(i);
+            }
+        }
+        None
     }
 }

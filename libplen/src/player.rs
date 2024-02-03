@@ -2,7 +2,7 @@ use serde_derive::{Serialize, Deserialize};
 
 use crate::math::{Vec2, vec2};
 use crate::snake::{Snake, SnakeSegment};
-use crate::food::Food;
+use crate::food::{Food, FoodType::*};
 
 
 const PLAYER_ANGLE_SPEED: f32 = 5.0;
@@ -41,13 +41,18 @@ impl Player {
         }
     }
 
-    pub fn cut(&mut self, index: usize) -> Vec<Vec2> {
+    pub fn try_cut(&mut self, index: usize, other_id: u64) -> Option<Vec<Vec2>> {
+        let segment = &self.snake.segments[index];
+        if !segment.cuttable && self.id != other_id {
+            return None;
+        }
+
         let mut cut_segment_positions = vec![];
         for segment in self.snake.segments.drain(index..) {
             cut_segment_positions.push(segment.position);
         }
         self.eat_grace_timer = EAT_GRACE_PERIOD;
-        cut_segment_positions
+        Some(cut_segment_positions)
     }
 
     pub fn collides_with(&self, other: &Snake) -> Option<usize> {
@@ -64,11 +69,22 @@ impl Player {
         if self.eat_grace_timer > 0 {
             return false;
         }
-        for _ in 0..food.energy {
-            self.snake.segments.push(SnakeSegment {
-                position: self.snake.segments.last().unwrap().position,
-                angle: self.snake.segments.last().unwrap().angle,
-            });
+        match food.food_type {
+            Normal(energy) => {
+                for _ in 0..energy {
+                    self.snake.segments.push(SnakeSegment {
+                        position: self.snake.segments.last().unwrap().position,
+                        angle: self.snake.segments.last().unwrap().angle,
+                        cuttable: true,
+                    });
+                }
+            },
+            Armor(energy) => {
+                let first_cuttable_index = self.snake.get_first_cuttable_index().unwrap_or(0);
+                for i in first_cuttable_index..(first_cuttable_index + energy) {
+                    self.snake.segments[i].cuttable = false;
+                }
+            },
         }
         true
     }

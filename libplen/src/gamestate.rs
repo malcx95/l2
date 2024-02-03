@@ -58,10 +58,17 @@ impl GameState {
             }
         }
         for (i, index) in cut_player_indices {
-            let cut_segment_positions = self.players[i].cut(index);
-            for position in cut_segment_positions.iter().step_by(FOOD_CUT_STRIDE) {
-                if self.food.len() < MAX_AMOUNT_OF_FOOD {
-                    self.food.push(Food::new(*position));
+            let other_id = self.players[i].id;
+            match self.players[i].try_cut(index, other_id) {
+                None => {},
+                Some(cut_segment_positions) => {
+                    for position in cut_segment_positions
+                        .iter().step_by(FOOD_CUT_STRIDE) {
+
+                        if self.food.len() < MAX_AMOUNT_OF_FOOD {
+                            self.food.push(Food::new(*position));
+                        }
+                    }
                 }
             }
         }
