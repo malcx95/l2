@@ -1,6 +1,7 @@
 use serde_derive::{Serialize, Deserialize};
 use crate::math::{Vec2, vec2, vec_add_wrap_around};
 use crate::constants;
+use crate::snake::Snake;
 use rand::{self, Rng};
 
 
@@ -47,7 +48,16 @@ impl Food {
         }
     }
 
-    pub fn update(&mut self, delta_time: f32) {
+    pub fn update(&mut self, delta_time: f32, snakes: &Vec<&Snake>) {
+        for snake in snakes {
+            match snake.get_collision_reflection(self.position, self.velocity) {
+                Some(reflection) => {
+                    self.velocity = reflection;
+                }
+                None => {}
+            }
+
+        }
         self.position = vec_add_wrap_around(self.position, self.velocity * delta_time, constants::WINDOW_SIZE);
     }
 

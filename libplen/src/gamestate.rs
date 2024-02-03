@@ -117,7 +117,7 @@ impl GameState {
     fn update_food(&mut self, delta: f32) {
         self.maybe_spawn_food();
         for food in &mut self.food {
-            food.update(delta);
+            food.update(delta, &self.players.iter().map(|p| &p.snake).collect());
         }
     }
 }

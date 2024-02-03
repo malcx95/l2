@@ -62,6 +62,14 @@ impl Mul<f32> for Vec2 {
     }
 }
 
+impl Mul<Vec2> for f32 {
+    type Output = Vec2;
+
+    fn mul(self, vec: Vec2) -> Vec2 {
+        vec * self
+    }
+}
+
 impl Div<f32> for Vec2 {
     type Output = Vec2;
 
@@ -99,6 +107,14 @@ impl Vec2 {
 
     pub fn dot(self, other: Self) -> f32 {
         self.x * other.x + self.y * other.y
+    }
+
+    pub fn get_normal(self) -> Self {
+        vec2(-self.y, self.x)
+    }
+
+    pub fn reflect(self, normal: Self) -> Self {
+        self - 2.0 * self.dot(normal) * normal
     }
 }
 

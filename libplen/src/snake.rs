@@ -2,6 +2,7 @@ use serde_derive::{Serialize, Deserialize};
 use crate::{constants, math::{self, vec2, Vec2}};
 
 const PLAYER_SPEED: f32 = 100.0;
+const FOOD_HIT_BOX: f32 = 5.0;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SnakeSegment {
@@ -52,6 +53,20 @@ impl Snake {
             old_angle = current_angle;
             old_position = current_position;
         }
+    }
+
+    pub fn get_collision_reflection(&self, pos: Vec2, velocity: Vec2) -> Option<Vec2> {
+        for i in 0..(self.segments.len() - 1) {
+            let curr_pos = self.segments[i].position;
+            let next_pos = self.segments[i + 1].position;
+            if (curr_pos - pos).norm() < FOOD_HIT_BOX {
+                let tangent = (next_pos - curr_pos).normalize();
+                let normal = tangent.get_normal();
+
+                return Some(velocity.reflect(normal));
+            }
+        }
+        None
     }
 
     pub fn get_first_cuttable_index(&self) -> Option<usize> {
