@@ -108,6 +108,14 @@ pub fn modulo(x: f32, div: f32) -> f32 {
 }
 
 
+pub fn vec_add_wrap_around(a: Vec2, b: Vec2, div: f32) -> Vec2 {
+    let mut result = a + b;
+    result.x = modulo(result.x, div);
+    result.y = modulo(result.y, div);
+    result
+}
+
+
 pub fn angle_diff(source_angle: f32, target_angle: f32) -> f32 {
     // From https://stackoverflow.com/a/7869457
     use std::f32::consts::PI;

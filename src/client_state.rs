@@ -3,6 +3,7 @@ use libplen::gamestate::GameState;
 use libplen::math::{self, vec2, Vec2};
 use macroquad::prelude::*;
 use macroquad::texture;
+use libplen::food::Food;
 
 use crate::assets::Assets;
 
@@ -29,28 +30,48 @@ impl ClientState {
     ) -> Result<(), String> {
 
         clear_background(BLACK);
-
-        draw_line(40.0, 40.0, 100.0, 200.0, 15.0, BLUE);
-        draw_rectangle(screen_width() / 2.0 - 60.0, 100.0, 120.0, 60.0, GREEN);
-        draw_circle(screen_width() - 30.0, screen_height() - 30.0, 15.0, YELLOW);
-        draw_text("HELLO", 20.0, 20.0, 20.0, DARKGRAY);
+        self.draw_bounds();
 
         for player in &game_state.players {
-            let params = texture::DrawTextureParams {
-                dest_size: None,
-                source: None,
-                rotation: player.angle,
-                flip_x: false,
-                flip_y: false,
-                pivot: None,
-            };
+            let head_px = player.snake.segments[0].position.x;
+            let head_py = player.snake.segments[0].position.y;
 
-            let px = player.position.x;
-            let py = player.position.y;
+            draw_circle(head_px, head_py, 5.0, RED);
 
-            texture::draw_texture_ex(assets.malcolm, px, py, BLUE, params);
+            for i in 0..(player.snake.segments.len() - 1) {
+                let curr = &player.snake.segments[i];
+                let next = &player.snake.segments[i + 1];
+                
+                draw_line(
+                    curr.position.x,
+                    curr.position.y,
+                    next.position.x,
+                    next.position.y,
+                    5.0,
+                    RED,
+                );
+
+            }
         }
+        self.draw_food(&game_state.food);
 
         Ok(())
+    }
+
+    fn draw_bounds(&self) {
+        draw_rectangle_lines(
+            0.0,
+            0.0,
+            constants::WINDOW_SIZE,
+            constants::WINDOW_SIZE,
+            5.0,
+            WHITE,
+        );
+    }
+
+    fn draw_food(&self, food: &Vec<Food>) {
+        for f in food {
+            draw_circle(f.position.x, f.position.y, 5.0, YELLOW);
+        }
     }
 }

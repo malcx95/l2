@@ -2,9 +2,10 @@ use serde_derive::{Serialize, Deserialize};
 
 use crate::math::{Vec2, vec2};
 
+use crate::snake::{Snake, SnakeSegment};
 
-const PLAYER_ANGLE_SPEED: f32 = 0.01;
-const PLAYER_FORWARD_INERTIA: f32 = 5.0;
+
+const PLAYER_ANGLE_SPEED: f32 = 5.0;
 
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -15,9 +16,7 @@ pub struct Player {
     pub input_x: f32,
     pub input_y: f32,
 
-    pub position: Vec2,
-    pub angle: f32,
-    pub speed: f32
+    pub snake: Snake,
 }
 
 
@@ -33,9 +32,7 @@ impl Player {
             input_x: 0.,
             input_y: 0.,
 
-            position: vec2(0., 0.),
-            angle: 0.,
-            speed: 0.
+            snake: Snake::new(),
         }
     }
 
@@ -45,9 +42,7 @@ impl Player {
     }
 
     pub fn update(&mut self, delta_time: f32) {
-        self.angle += self.input_x * PLAYER_ANGLE_SPEED;
-        self.speed += self.input_y * PLAYER_FORWARD_INERTIA;
-
-        self.position += Vec2::from_direction(self.angle, self.speed * delta_time);
+        let delta_angle = self.input_x * PLAYER_ANGLE_SPEED * delta_time;
+        self.snake.update(delta_angle, delta_time);
     }
 }

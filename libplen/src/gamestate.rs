@@ -2,20 +2,23 @@ use std::sync::mpsc::Receiver;
 
 use serde_derive::{Serialize, Deserialize};
 
+use crate::constants;
 use crate::player::Player;
 use crate::math::{Vec2, vec2};
+use crate::food::Food;
+
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
     pub players: Vec<Player>,
-    // put server side game state stuff here
+    pub food: Vec<Food>,
 }
 
 impl GameState {
     pub fn new() -> GameState {
         GameState {
             players: Vec::new(),
-            // init server side game state stuff here
+            food: Vec::new(),
         }
     }
 
@@ -30,8 +33,8 @@ impl GameState {
     pub fn update(&mut self, delta: f32) {
         for player in &mut self.players {
             player.update(delta);
-            println!("{} {}", player.position.x, player.position.y);
         }
+        self.update_food(delta);
     }
 
     pub fn add_player(&mut self, player: Player) {
@@ -45,5 +48,20 @@ impl GameState {
             }
         }
         None
+    }
+
+    fn maybe_spawn_food(&mut self) {
+        if self.food.len() < 10 {
+            let x = rand::random::<f32>() * constants::WINDOW_SIZE;
+            let y = rand::random::<f32>() * constants::WINDOW_SIZE;
+            self.food.push(Food::new(vec2(x, y)));
+        }
+    }
+
+    fn update_food(&mut self, delta: f32) {
+        self.maybe_spawn_food();
+        for food in &mut self.food {
+            food.update(delta);
+        }
     }
 }
