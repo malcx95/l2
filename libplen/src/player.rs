@@ -80,9 +80,13 @@ impl Player {
                 }
             },
             Armor(energy) => {
-                let first_cuttable_index = self.snake.get_first_cuttable_index().unwrap_or(0);
-                for i in first_cuttable_index..(first_cuttable_index + energy).max(self.snake.segments.len() - 1) {
-                    self.snake.segments[i].cuttable = false;
+                match self.snake.get_first_cuttable_index() {
+                    Some(first_cuttable_index) => {
+                        for i in first_cuttable_index..(first_cuttable_index + energy).min(self.snake.segments.len()) {
+                            self.snake.segments[i].cuttable = false;
+                        }
+                    }
+                    None => {}
                 }
             },
         }
