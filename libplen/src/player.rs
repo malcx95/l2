@@ -6,7 +6,7 @@ use crate::food::Food;
 
 
 const PLAYER_ANGLE_SPEED: f32 = 5.0;
-const NUMBER_OF_NON_COLLIDABLE_SEGMENTS: usize = 30;
+const NUMBER_OF_NON_COLLIDABLE_SEGMENTS: usize = 6;
 const EAT_GRACE_PERIOD: i32 = 10;
 
 

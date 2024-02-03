@@ -11,6 +11,10 @@ use crate::assets::Assets;
 
 const MAX_SEGMENT_DISTANCE: f32 = 10.0;
 
+const COLORS: [macroquad::color::Color; 13] = [
+    RED, GREEN, BLUE, YELLOW, PURPLE, ORANGE, PINK, VIOLET, MAGENTA, LIME, BROWN, GOLD, WHITE
+];
+
 
 pub struct ClientState {
     screen_scale: f32,
@@ -40,19 +44,23 @@ impl ClientState {
 
         clear_background(BLACK);
         self.draw_bounds();
-        self.draw_players(&game_state.players);
+        self.draw_players(&game_state.players, my_id);
         self.draw_food(&game_state.food);
 
         Ok(())
     }
 
-    fn draw_players(&self, players: &Vec<Player>) {
+    fn draw_players(&self, players: &Vec<Player>, my_id: u64) {
         for player in players {
+            let color = COLORS[player.id as usize % COLORS.len()];
+
             let head_px = player.snake.segments[0].position.x;
             let head_py = player.snake.segments[0].position.y;
 
             draw_circle(head_px * self.screen_scale, head_py * self.screen_scale,
-                5.0 * self.screen_scale, RED);
+                5.0 * self.screen_scale, color);
+
+            let body_color = Color::new(color.r, color.g, color.b, 0.9);
 
             for i in 0..(player.snake.segments.len() - 1) {
                 let curr = &player.snake.segments[i];
@@ -68,7 +76,7 @@ impl ClientState {
                     next.position.x * self.screen_scale,
                     next.position.y * self.screen_scale,
                     5.0 * self.screen_scale,
-                    RED,
+                    body_color,
                 );
 
             }
