@@ -35,6 +35,23 @@ impl GameState {
             player.update(delta);
         }
         self.update_food(delta);
+        self.handle_player_food();
+    }
+
+    pub fn handle_player_food(&mut self) {
+        let mut eaten_food_indices = vec![];
+        for player in &mut self.players {
+            for i in 0..self.food.len() {
+                let food = &self.food[i];
+                if food.collides_with(player.get_head_position()) {
+                    player.eat(food);
+                    eaten_food_indices.push(i);
+                }
+            }
+        }
+        for i in eaten_food_indices.iter().rev() {
+            self.food.remove(*i);
+        }
     }
 
     pub fn add_player(&mut self, player: Player) {

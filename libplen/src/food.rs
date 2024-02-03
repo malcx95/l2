@@ -5,12 +5,15 @@ use rand::{self, Rng};
 
 
 const FOOD_SPEED: f32 = 100.0;
+const FOOD_SIZE: f32 = 10.0;
+const FOOD_ENERGY: u32 = 10;
 
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Food {
     pub position: Vec2,
     pub velocity: Vec2,
+    pub energy: u32,
 }
 
 
@@ -22,10 +25,15 @@ impl Food {
         Food {
             position,
             velocity: vec2(x, y),
+            energy: FOOD_ENERGY,
         }
     }
 
     pub fn update(&mut self, delta_time: f32) {
         self.position = vec_add_wrap_around(self.position, self.velocity * delta_time, constants::WINDOW_SIZE);
+    }
+
+    pub fn collides_with(&self, position: Vec2) -> bool {
+        (self.position - position).norm() < FOOD_SIZE
     }
 }

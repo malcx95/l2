@@ -1,8 +1,8 @@
 use serde_derive::{Serialize, Deserialize};
 
 use crate::math::{Vec2, vec2};
-
 use crate::snake::{Snake, SnakeSegment};
+use crate::food::Food;
 
 
 const PLAYER_ANGLE_SPEED: f32 = 5.0;
@@ -34,6 +34,19 @@ impl Player {
 
             snake: Snake::new(),
         }
+    }
+
+    pub fn eat(&mut self, food: &Food) {
+        for i in 0..food.energy {
+            self.snake.segments.push(SnakeSegment {
+                position: self.snake.segments.last().unwrap().position,
+                angle: self.snake.segments.last().unwrap().angle,
+            });
+        }
+    }
+
+    pub fn get_head_position(&self) -> Vec2 {
+        self.snake.segments[0].position
     }
 
     pub fn set_input(&mut self, input_x: f32, input_y: f32) {
