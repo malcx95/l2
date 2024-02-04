@@ -14,6 +14,7 @@ const MAX_SEGMENT_DISTANCE: f32 = 30.0;
 const FOOD_SIZE: f32 = 5.0;
 const PLAYER_MENU_SPACING: f32 = 80.0;
 const PLAYER_MENU_Y: f32 = constants::WINDOW_SIZE - 100.0;
+const LEADERBOARD_SNAKE_SCALE: f32 = 0.5;
 
 const COLORS: [macroquad::color::Color; 11] = [
     RED, GREEN, PURPLE, ORANGE, PINK, VIOLET, MAGENTA, LIME, BROWN, GOLD, WHITE
@@ -57,6 +58,7 @@ impl ClientState {
                 self.draw_players(&game_state.players, my_id);
                 self.draw_food(&game_state.food);
                 self.draw_progress_bar(game_state);
+                self.draw_leaderboard(game_state);
             }
             libplen::gamestate::GameStage::Ended => {
                 self.draw_end_screen(game_state);
@@ -64,6 +66,31 @@ impl ClientState {
         }
 
         Ok(())
+    }
+
+
+    fn draw_leaderboard(&self, game_state: &GameState) {
+        for (i, player_id) in game_state.player_leaderboard.iter().enumerate() {
+            let player = game_state.get_player_by_id(*player_id).unwrap();
+            let color = COLORS[player.color % COLORS.len()];
+            let body_color = Color::new(color.r, color.g, color.b, 0.9);
+            
+            let px = constants::WINDOW_SIZE + (i as f32 + 1.0) * 50.0;
+            let py = 50.0;
+            draw_circle(px * self.screen_scale, py * self.screen_scale,
+                5.0 * self.screen_scale, color);
+
+            for j in 0..(player.snake.segments.len() - 1) {
+                draw_line(
+                    px * self.screen_scale,
+                    (py + (j as f32) * LEADERBOARD_SNAKE_SCALE) * self.screen_scale,
+                    px * self.screen_scale,
+                    (py + (j as f32 + 1.0) * LEADERBOARD_SNAKE_SCALE) * self.screen_scale,
+                    5.0 * self.screen_scale,
+                    body_color,
+                );
+            }
+        }
     }
 
 
