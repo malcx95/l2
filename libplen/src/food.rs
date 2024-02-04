@@ -10,7 +10,7 @@ const FOOD_SIZE: f32 = 10.0;
 const FOOD_ENERGY: u32 = 10;
 
 const ARMOR_ENERGY: usize = 10;
-const ARMOR_PROBABILITY: f32 = 0.1;
+const ARMOR_PROBABILITY: f32 = 0.5;
 
 
 #[derive(Clone, Copy, Serialize, Deserialize)]

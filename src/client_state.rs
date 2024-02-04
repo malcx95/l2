@@ -214,14 +214,14 @@ impl ClientState {
                     FOOD_SIZE * self.screen_scale, 
                     YELLOW),
                 FoodType::Armor(_) => {
-                    let v1: Vec2 = f.position+vec2( 0.00, -1.00);
-                    let v2: Vec2 = f.position+vec2( 0.87,  0.50);
-                    let v3: Vec2 = f.position+vec2(-0.87,  0.50);
+                    let v1 = f.position + FOOD_SIZE * self.screen_scale * vec2( 0.00, -1.00);
+                    let v2 = f.position + FOOD_SIZE * self.screen_scale * vec2( 0.87,  0.50);
+                    let v3 = f.position + FOOD_SIZE * self.screen_scale * vec2(-0.87,  0.50);
                     draw_triangle(
-                        FOOD_SIZE * macroquad_vec2(v1.x, v1.y) * self.screen_scale, 
-                        FOOD_SIZE * macroquad_vec2(v2.x, v2.y) * self.screen_scale, 
-                        FOOD_SIZE * macroquad_vec2(v3.x, v3.y) * self.screen_scale,
-                        BLUE)
+                        macroquad_vec2(v1.x, v1.y) * self.screen_scale, 
+                        macroquad_vec2(v2.x, v2.y) * self.screen_scale, 
+                        macroquad_vec2(v3.x, v3.y) * self.screen_scale,
+                        BLUE);
                 },
             };
         }
