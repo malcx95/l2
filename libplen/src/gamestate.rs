@@ -114,16 +114,16 @@ impl GameState {
                 let player2 = &self.players[j];
                 match player1.collides_with(&player2.snake) {
                     Some(index) => {
-                        cut_player_indices.push((j, index));
+                        cut_player_indices.push((i, j, index));
                         sound_effects.push(SoundEffect::Cut);
                     }
                     None => {}
                 }
             }
         }
-        for (i, index) in cut_player_indices {
+        for (i, j, index) in cut_player_indices {
             let other_id = self.players[i].id;
-            match self.players[i].try_cut(index, other_id) {
+            match self.players[j].try_cut(index, other_id) {
                 None => {},
                 Some(cut_segment_positions) => {
                     for position in cut_segment_positions
