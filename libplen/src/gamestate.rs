@@ -115,7 +115,6 @@ impl GameState {
                 match player1.collides_with(&player2.snake) {
                     Some(index) => {
                         cut_player_indices.push((i, j, index));
-                        sound_effects.push(SoundEffect::Cut);
                     }
                     None => {}
                 }
@@ -128,11 +127,11 @@ impl GameState {
                 Some(cut_segment_positions) => {
                     for position in cut_segment_positions
                         .iter().step_by(FOOD_CUT_STRIDE) {
-
                         if self.food.len() < MAX_AMOUNT_OF_FOOD {
                             self.food.push(Food::new(*position));
                         }
                     }
+                    sound_effects.push(SoundEffect::Cut);
                 }
             }
         }
