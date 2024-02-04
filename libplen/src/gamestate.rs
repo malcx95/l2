@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::mpsc::Receiver;
 
 use serde_derive::{Serialize, Deserialize};
@@ -25,6 +26,8 @@ pub struct GameState {
     pub players: Vec<Player>,
     pub food: Vec<Food>,
     pub stage: GameStage,
+    pub game_timer: f32,
+    pub player_leaderboard: Vec<u64>,
 }
 
 impl GameState {
@@ -33,6 +36,19 @@ impl GameState {
             players: Vec::new(),
             food: Vec::new(),
             stage: GameStage::Lobby,
+            game_timer: constants::GAME_DURATION,
+            player_leaderboard: Vec::new(),
+        }
+    }
+    
+
+    fn reset(&mut self) {
+        self.food = Vec::new();
+        self.stage = GameStage::Lobby;
+        self.game_timer = constants::GAME_DURATION;
+        self.player_leaderboard = Vec::new();
+        for player in &mut self.players {
+            player.reset();
         }
     }
 
@@ -53,6 +69,11 @@ impl GameState {
                 self.update_food(delta);
                 self.handle_player_food();
                 self.handle_player_collisions();
+                self.game_timer -= delta;
+                if self.game_timer <= 0.0 {
+                    self.stage = GameStage::Ended;
+                }
+                self.update_leaderboard();
             },
             GameStage::Lobby => {
                 for player in &self.players {
@@ -61,8 +82,25 @@ impl GameState {
                     }
                 }
             },
-            _ => {}
+            GameStage::Ended => {
+                let mut should_reset = false;
+                for player in &self.players {
+                    if player.input_start_game {
+                        should_reset = true;
+                    }
+                }
+                if should_reset {
+                    self.reset();
+                }
+            }
         }
+    }
+
+    pub fn update_leaderboard(&mut self) {
+        let mut player_lengths: Vec<(u64, usize)> = self.players.iter().map(|p| (p.id, p.snake.len())).collect();
+
+        player_lengths.sort_by(|a, b| b.1.cmp(&a.1));
+        self.player_leaderboard = player_lengths.iter().map(|(id, _)| *id).collect();
     }
 
     fn handle_player_collisions(&mut self) {

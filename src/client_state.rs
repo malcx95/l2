@@ -53,13 +53,62 @@ impl ClientState {
             libplen::gamestate::GameStage::Lobby => {
                 self.draw_menu(game_state, assets);
             }
-            _ => {
+            libplen::gamestate::GameStage::Running => {
                 self.draw_players(&game_state.players, my_id);
                 self.draw_food(&game_state.food);
+                self.draw_progress_bar(game_state);
+            }
+            libplen::gamestate::GameStage::Ended => {
+                self.draw_end_screen(game_state);
             }
         }
 
         Ok(())
+    }
+
+
+    fn draw_progress_bar(&self, game_state: &GameState) {
+        let progress = game_state.game_timer / constants::GAME_DURATION;
+        let width = constants::WINDOW_SIZE * progress * self.screen_scale;
+        draw_rectangle(
+            0.0,
+            constants::WINDOW_SIZE * self.screen_scale + 10.0 * self.screen_scale,
+            width,
+            10.0 * self.screen_scale,
+            Color::new(1.0 - progress, progress, 0.0, 0.5),
+        );
+    }
+
+
+    fn draw_end_screen(&self, game_state: &GameState) {
+        let text1 = "då var spelet slut";
+        let text2 = "tryck space för att börja om";
+        draw_text(
+            text1,
+            (constants::WINDOW_SIZE / 10.0) * self.screen_scale,
+            (constants::WINDOW_SIZE / 2.0) * self.screen_scale,
+            40.0 * self.screen_scale,
+            WHITE,
+        );
+        draw_text(
+            text2,
+            (constants::WINDOW_SIZE / 10.0) * self.screen_scale,
+            (constants::WINDOW_SIZE / 2.0 + 20.0) * self.screen_scale,
+            24.0 * self.screen_scale,
+            WHITE,
+        );
+
+        for (i, player_id) in game_state.player_leaderboard.iter().enumerate() {
+            let player = game_state.get_player_by_id(*player_id).unwrap();
+            let text = format!("{}. {}", i + 1, &player.name);
+            draw_text(
+                &text,
+                (constants::WINDOW_SIZE / 2.0) * self.screen_scale,
+                (constants::WINDOW_SIZE / 2.0 + 100.0 + 30.0 * (i as f32)) * self.screen_scale,
+                24.0 * self.screen_scale,
+                COLORS[player.color % COLORS.len()],
+            );
+        }
     }
 
     fn draw_menu(&self, game_state: &GameState, assets: &mut Assets) {

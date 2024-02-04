@@ -53,6 +53,12 @@ impl Player {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.snake = Snake::new();
+        self.player_speed = PLAYER_MIN_SPEED;
+        self.eat_grace_timer = 0;
+    }
+
     pub fn try_cut(&mut self, index: usize, other_id: u64) -> Option<Vec<Vec2>> {
         let segment = &self.snake.segments[index];
         if !segment.cuttable && self.id != other_id {

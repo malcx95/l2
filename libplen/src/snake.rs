@@ -34,6 +34,10 @@ impl Snake {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.segments.len()
+    }
+
     pub fn update(&mut self, delta_angle: f32, delta_time: f32, speed: f32) {
         let head = &mut self.segments[0];
         let delta_position = Vec2::from_direction(head.angle, speed * delta_time);
