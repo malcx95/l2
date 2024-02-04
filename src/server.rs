@@ -80,10 +80,12 @@ impl Server {
         }
         self.last_time = Instant::now();
 
-        self.state.update(delta_time);
+
+        let mut sounds_to_play = vec![];
+        self.state.update(&mut sounds_to_play, delta_time);
 
         self.accept_new_connections();
-        self.update_clients(delta_time);
+        self.update_clients(delta_time, &sounds_to_play);
     }
 
     fn accept_new_connections(&mut self) {
@@ -119,10 +121,9 @@ impl Server {
         }
     }
 
-    fn update_clients(&mut self, delta_time: f32) {
+    fn update_clients(&mut self, delta_time: f32, sounds_to_play: &Vec<SoundEffect>) {
         // Send data to clients
         let mut clients_to_delete = vec![];
-        // let mut sounds_to_play = vec![];
 
         macro_rules! remove_player_on_disconnect {
             ($op:expr, $id:expr) => {
@@ -192,15 +193,15 @@ impl Server {
             }
         }
 
-        // for (sound, pos) in &sounds_to_play {
-        //     for client in self.connections.iter_mut() {
-        //         let result = send_server_message(
-        //             &ServerMessage::PlaySound(*sound, *pos),
-        //             &mut client.message_reader.stream,
-        //         );
-        //         remove_player_on_disconnect!(result, client.id);
-        //     }
-        // }
+        for sound in sounds_to_play {
+            for client in self.connections.iter_mut() {
+                let result = send_server_message(
+                    &ServerMessage::PlaySound(*sound),
+                    &mut client.message_reader.stream,
+                );
+                remove_player_on_disconnect!(result, client.id);
+            }
+        }
 
         self.state
             .players

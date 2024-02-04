@@ -4,6 +4,7 @@ use std::sync::mpsc::Receiver;
 use serde_derive::{Serialize, Deserialize};
 
 use crate::constants;
+use crate::messages::SoundEffect;
 use crate::player::Player;
 use crate::math::{Vec2, vec2};
 use crate::food::Food;
@@ -60,18 +61,19 @@ impl GameState {
      *  vec with positions where lasers are fired
      *  )
      */
-    pub fn update(&mut self, delta: f32) {
+    pub fn update(&mut self, sound_effects: &mut Vec<SoundEffect>, delta: f32) {
         match self.stage {
             GameStage::Running => {
                 for player in &mut self.players {
                     player.update(delta);
                 }
-                self.update_food(delta);
-                self.handle_player_food();
-                self.handle_player_collisions();
+                self.update_food(delta, sound_effects);
+                self.handle_player_food(sound_effects);
+                self.handle_player_collisions(sound_effects);
                 self.game_timer -= delta;
                 if self.game_timer <= 0.0 {
                     self.stage = GameStage::Ended;
+                    sound_effects.push(SoundEffect::End);
                 }
                 self.update_leaderboard();
             },
@@ -79,6 +81,7 @@ impl GameState {
                 for player in &self.players {
                     if player.input_start_game {
                         self.stage = GameStage::Running;
+                        sound_effects.push(SoundEffect::Start);
                     }
                 }
             },
@@ -103,7 +106,7 @@ impl GameState {
         self.player_leaderboard = player_lengths.iter().map(|(id, _)| *id).collect();
     }
 
-    fn handle_player_collisions(&mut self) {
+    fn handle_player_collisions(&mut self, sound_effects: &mut Vec<SoundEffect>) {
         let mut cut_player_indices = vec![];
         for i in 0..self.players.len() {
             for j in 0..self.players.len() {
@@ -112,6 +115,7 @@ impl GameState {
                 match player1.collides_with(&player2.snake) {
                     Some(index) => {
                         cut_player_indices.push((j, index));
+                        sound_effects.push(SoundEffect::Cut);
                     }
                     None => {}
                 }
@@ -134,13 +138,14 @@ impl GameState {
         }
     }
 
-    fn handle_player_food(&mut self) {
+    fn handle_player_food(&mut self, sound_effects: &mut Vec<SoundEffect>) {
         let mut eaten_food_indices = vec![];
         for player in &mut self.players {
             for i in 0..self.food.len() {
                 let food = &self.food[i];
                 if food.collides_with(player.get_head_position()) {
                     if player.try_eat(food){
+                        sound_effects.push(SoundEffect::Eat);
                         eaten_food_indices.push(i);
                     }
                 }
@@ -174,10 +179,10 @@ impl GameState {
         }
     }
 
-    fn update_food(&mut self, delta: f32) {
+    fn update_food(&mut self, delta: f32, sound_effects: &mut Vec<SoundEffect>) {
         self.maybe_spawn_food();
         for food in &mut self.food {
-            food.update(delta, &self.players.iter().map(|p| &p.snake).collect());
+            food.update(delta, &self.players.iter().map(|p| &p.snake).collect(), sound_effects);
         }
     }
 }

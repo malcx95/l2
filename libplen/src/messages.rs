@@ -75,12 +75,13 @@ impl Iterator for MessageIterator<'_> {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
-pub enum SoundEffect { Powerup, Explosion, Gun, LaserCharge, LaserFire }
+pub enum SoundEffect { Welcome, Eat, Cut, FoodBounce, Start, End }
 
 #[derive(Serialize, Deserialize)]
 pub enum ServerMessage {
     AssignId(u64),
-    GameState(crate::gamestate::GameState)
+    GameState(crate::gamestate::GameState),
+    PlaySound(SoundEffect),
 }
 
 #[derive(Serialize, Deserialize)]

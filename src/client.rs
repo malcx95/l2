@@ -67,7 +67,7 @@ impl MainState {
         ClientInput{ x_input, y_input, start_game: is_key_pressed(KeyCode::Space), change_color: is_key_pressed(KeyCode::C) }
     }
 
-    fn update(&mut self, server_reader: &mut MessageReader) -> StateResult {
+    fn update(&mut self, server_reader: &mut MessageReader, assets: &mut Assets) -> StateResult {
         let elapsed = self.last_time.elapsed();
         self.last_time = Instant::now();
         let dt_duration = std::time::Duration::from_millis(1000 / 60);
@@ -81,6 +81,7 @@ impl MainState {
             match bincode::deserialize(&message).unwrap() {
                 ServerMessage::AssignId(_) => panic!("Got new ID after intialisation"),
                 ServerMessage::GameState(state) => self.game_state = state,
+                ServerMessage::PlaySound(sound) => self.play_sound(sound, assets),
             }
         }
 
@@ -93,6 +94,17 @@ impl MainState {
         send_client_message(&input_message, &mut server_reader.stream);
 
         StateResult::Continue
+    }
+    
+    pub fn play_sound(&self, sound: SoundEffect, assets: &Assets) {
+        match sound {
+            SoundEffect::Welcome => macroquad::audio::play_sound_once(assets.welcome),
+            SoundEffect::Eat => macroquad::audio::play_sound_once(assets.eat),
+            SoundEffect::Cut => macroquad::audio::play_sound_once(assets.cut),
+            SoundEffect::FoodBounce => macroquad::audio::play_sound_once(assets.food_bounce),
+            SoundEffect::Start => macroquad::audio::play_sound_once(assets.start),
+            SoundEffect::End => macroquad::audio::play_sound_once(assets.end),
+        }
     }
 
     fn draw(&mut self, assets: &mut Assets) -> Result<(), String> {
@@ -142,10 +154,11 @@ async fn main() -> Result<(), String> {
             &mut reader.stream,
         );
 
-        // let main_state = &mut MainState::new(my_id);
+        main_state.play_sound(SoundEffect::Welcome, &assets);
+
         loop {
 
-            main_state.update(&mut reader);
+            main_state.update(&mut reader, &mut assets);
 
             main_state.draw(&mut assets)?;
 

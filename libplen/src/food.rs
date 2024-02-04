@@ -1,6 +1,7 @@
 use serde_derive::{Serialize, Deserialize};
 use crate::math::{Vec2, vec2, vec_add_wrap_around};
 use crate::constants;
+use crate::messages::SoundEffect;
 use crate::snake::Snake;
 use rand::{self, Rng};
 
@@ -10,7 +11,7 @@ const FOOD_SIZE: f32 = 10.0;
 const FOOD_ENERGY: u32 = 10;
 
 const ARMOR_ENERGY: usize = 10;
-const ARMOR_PROBABILITY: f32 = 0.5;
+const ARMOR_PROBABILITY: f32 = 0.1;
 
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
@@ -48,11 +49,12 @@ impl Food {
         }
     }
 
-    pub fn update(&mut self, delta_time: f32, snakes: &Vec<&Snake>) {
+    pub fn update(&mut self, delta_time: f32, snakes: &Vec<&Snake>, sound_effects: &mut Vec<SoundEffect>) {
         for snake in snakes {
             match snake.get_collision_reflection(self.position, self.velocity) {
                 Some(reflection) => {
                     self.velocity = reflection;
+                    sound_effects.push(SoundEffect::FoodBounce);
                 }
                 None => {}
             }

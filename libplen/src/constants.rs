@@ -7,4 +7,4 @@ pub const WINDOW_SIZE: f32 = 800.;
 
 pub const NAME_POS: (f32, f32) = (50., 150.);
 
-pub const GAME_DURATION: f32 = 10.0;
+pub const GAME_DURATION: f32 = 60.0;
