@@ -100,6 +100,9 @@ impl Player {
             Armor(energy) => {
                 match self.snake.get_first_cuttable_index() {
                     Some(first_cuttable_index) => {
+                        if first_cuttable_index == NUMBER_OF_NON_COLLIDABLE_SEGMENTS {
+                            self.snake.reset_armor_decay();
+                        }
                         for i in first_cuttable_index..(first_cuttable_index + energy).min(self.snake.segments.len()) {
                             self.snake.segments[i].cuttable = false;
                         }
@@ -130,6 +133,6 @@ impl Player {
             self.player_speed + self.input_y * PLAYER_ACCELERATION,
             PLAYER_MIN_SPEED, PLAYER_MAX_SPEED);
 
-        self.snake.update(delta_angle, delta_time, self.player_speed);
+        self.snake.update(delta_angle, delta_time, self.player_speed, NUMBER_OF_NON_COLLIDABLE_SEGMENTS);
     }
 }

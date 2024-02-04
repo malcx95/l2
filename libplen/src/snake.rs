@@ -3,6 +3,7 @@ use crate::{constants, math::{self, vec2, Vec2}};
 use rand::{self, Rng};
 
 const FOOD_HIT_BOX: f32 = 5.0;
+const MAX_ARMOR_DECAY: u32 = 200;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SnakeSegment {
@@ -15,6 +16,7 @@ pub struct SnakeSegment {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Snake {
     pub segments: Vec<SnakeSegment>,
+    pub armor_decay: u32,
 }
 
 
@@ -31,6 +33,7 @@ impl Snake {
                     cuttable: true,
                 }
             ],
+            armor_decay: 0,
         }
     }
 
@@ -38,7 +41,26 @@ impl Snake {
         self.segments.len()
     }
 
-    pub fn update(&mut self, delta_angle: f32, delta_time: f32, speed: f32) {
+    pub fn reset_armor_decay(&mut self) {
+        self.armor_decay = MAX_ARMOR_DECAY;
+    }
+
+    pub fn update(&mut self, delta_angle: f32, delta_time: f32, speed: f32, neck: usize) {
+        if self.armor_decay == 0 {
+            match self.get_first_cuttable_index() {
+                Some(index) => {
+                    if index != neck.saturating_sub(1){
+                        self.segments[index.saturating_sub(1)].cuttable = true;
+                        self.armor_decay = MAX_ARMOR_DECAY;
+                    }
+                },
+                None => {}
+            }
+        }
+        else {
+            self.armor_decay -= 1;
+        }
+        
         let head = &mut self.segments[0];
         let delta_position = Vec2::from_direction(head.angle, speed * delta_time);
         let mut old_angle = head.angle;
