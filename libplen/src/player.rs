@@ -61,7 +61,7 @@ impl Player {
 
     pub fn try_cut(&mut self, index: usize, other_id: u64) -> Option<Vec<Vec2>> {
         let segment = &self.snake.segments[index];
-        if !segment.cuttable && self.id != other_id {
+        if (!segment.cuttable && self.id != other_id) || index <= NUMBER_OF_NON_COLLIDABLE_SEGMENTS {
             return None;
         }
 
